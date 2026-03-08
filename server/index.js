@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import rateLimit from 'express-rate-limit';
 import connectDB from './config/db.js';
 import userRoute from './Routes/userRoute.js';
 import transactionRoute from './Routes/transactionRoute.js';
@@ -11,11 +12,19 @@ dotenv.config();
 
 const app = express();
 
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
 app.use(cors({
     origin: 'http://localhost:5173',
     credentials: true
 }));
 app.use(express.json());
+app.use(limiter);
 
 app.use('/api/user', userRoute);
 app.use('/api/transaction', transactionRoute);
